@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, request, url_for
 from wtform_fields import *
 from models import *
 
+
 app = Flask(__name__)
 app.secret_key = 'placeholder'
 
@@ -17,8 +18,10 @@ def index():
         username = reg_form.username.data
         password = reg_form.password.data
 
+        hashed_pswd = pbkdf2_sha512.hash(password)
+
         # Add user to DB if validation success
-        user = User(username=username, password=password)
+        user = User(username=username, password=hashed_pswd)
         db.session.add(user)
         db.session.commit()
 
