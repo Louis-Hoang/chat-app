@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, url_for
+from flask import Flask, render_template, redirect, request, url_for, flash
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from wtform_fields import *
 from models import *
@@ -34,6 +34,7 @@ def index():
         db.session.add(user)
         db.session.commit()
 
+        flash('Registered successfully', 'success')
         return redirect(url_for('login'))
 
     return render_template("index.html", form=reg_form)
@@ -53,14 +54,16 @@ def login():
 @app.route("/chat", methods=["GET", "POST"])
 def chat():
     if not current_user.is_authenticated:
-        return "Please log in first"
+        flash('Please log in', 'danger')
+        return redirect(url_for('login'))
     return "let's started !"
 
 
-@app.route("/logout", methods=["GET"])
+@ app.route("/logout", methods=["GET"])
 def logout():
     logout_user()
-    return "Log out success"
+    flash('Log out successfully', 'success')
+    return redirect(url_for('login'))
 
 
 if __name__ == "__main__":  # allow excute when file run as script
