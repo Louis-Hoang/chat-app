@@ -1,16 +1,25 @@
+from time import localtime, strftime
 from flask import Flask, render_template, redirect, request, url_for, flash
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
+from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from wtform_fields import *
 from models import *
 
 
+# Config flask login
 app = Flask(__name__)
 app.secret_key = 'placeholder'
 
+# Config database
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://okenthdbfaisxz:bcc6d85268ee971c63712f50b1f39ff76f105e7c71233322a3e665673dad5836@ec2-52-73-155-171.compute-1.amazonaws.com:5432/d6bhbpbas2bvci"
-
 db = SQLAlchemy(app)
 
+# Init SocketIO
+socketio = SocketIO(app)
+ROOMS = ['general', "outdoor", "film", "game", "study"]
+
+
+# Config Flask login
 login = LoginManager(app)
 login.init_app(app)
 
@@ -53,18 +62,29 @@ def login():
 
 @app.route("/chat", methods=["GET", "POST"])
 def chat():
-    if not current_user.is_authenticated:
-        flash('Please log in', 'danger')
-        return redirect(url_for('login'))
-    return "let's started !"
+    return render_template("chat.html", username = current_user.username, rooms=ROOMS)
 
 
-@ app.route("/logout", methods=["GET"])
+@app.route("/logout", methods=["GET"])
 def logout():
     logout_user()
     flash('Log out successfully', 'success')
     return redirect(url_for('login'))
 
 
+@socketio.on('message')
+def message(data):
+    send({'msg': data['msg'], 'username': data['username'], 'room': data['room'], 'time_stamp': strftime('%b-%d %I:%M%p', localtime())}, room=data['room'])
+    
+@socketio.on('join')
+def join(data):
+    join_room(data['room'])
+    send({'msg': data['username'] + " has joined the " + data['room'] + " room."}, room=data['room'])
+
+@socketio.on('leave')
+def leave(data):
+    leave_room(data['room'])
+    send({'msg': data['username'] + " has left the " + data['room'] + " room."}, room=data['room'])
+
 if __name__ == "__main__":  # allow excute when file run as script
-    app.run(debug=True)
+    socketio.run(app, port=8000, debug=True)
