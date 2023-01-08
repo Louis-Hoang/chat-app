@@ -1,4 +1,5 @@
-from time import localtime, strftime
+import os
+import time
 from flask import Flask, render_template, redirect, request, url_for, flash
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
@@ -15,14 +16,13 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://okenthdbfaisxz:bcc6d85268e
 db = SQLAlchemy(app)
 
 # Init SocketIO
-socketio = SocketIO(app)
+socketio = SocketIO(app, manage_session=False)
 ROOMS = ['general', "outdoor", "film", "game", "study"]
 
 
 # Config Flask login
 login = LoginManager(app)
 login.init_app(app)
-
 
 @login.user_loader
 def load_user(id):
@@ -52,18 +52,14 @@ def index():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     login_form = LoginForm()
+    # Allow login if validation through
     if login_form.validate_on_submit():
         user_object = User.query.filter_by(
             username=login_form.username.data).first()
         login_user(user_object)
         return redirect(url_for('chat'))
+
     return render_template("login.html", form=login_form)
-
-
-@app.route("/chat", methods=["GET", "POST"])
-def chat():
-    return render_template("chat.html", username = current_user.username, rooms=ROOMS)
-
 
 @app.route("/logout", methods=["GET"])
 def logout():
@@ -72,19 +68,47 @@ def logout():
     return redirect(url_for('login'))
 
 
+@app.route("/chat", methods=["GET", "POST"])
+def chat():
+    if not current_user.is_authenticated:
+        flash('Please login', 'danger')
+        return redirect(url_for('login'))
+    return render_template("chat.html", username = current_user.username, rooms=ROOMS)
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    # set the 404 status explicitly
+    return render_template('404.html'), 404
+
+
+
 @socketio.on('message')
 def message(data):
-    send({'msg': data['msg'], 'username': data['username'], 'room': data['room'], 'time_stamp': strftime('%b-%d %I:%M%p', localtime())}, room=data['room'])
+    msg = data["msg"]
+    username = data["username"]
+    room = data["room"]
+    time_stamp = time.strftime('%b-%d %I:%M%p', time.localtime())
+    send({'msg': data['msg'], 'username': data['username'], 'room': data['room'], 'time_stamp': time_stamp}, room=room)
     
+
 @socketio.on('join')
 def join(data):
-    join_room(data['room'])
-    send({'msg': data['username'] + " has joined the " + data['room'] + " room."}, room=data['room'])
+    #User join room
+    username = data["username"]
+    room = data["room"]
+    join_room(room)
+    send({'msg': username + " has joined the " + room + " room."}, room=room)
+
 
 @socketio.on('leave')
 def leave(data):
-    leave_room(data['room'])
-    send({'msg': data['username'] + " has left the " + data['room'] + " room."}, room=data['room'])
+    #User leave room
+    username = data["username"]
+    room = data["room"]
+    leave_room(room)
+    send({'msg': username + " has left the " + room + " room."}, room=room)
 
 if __name__ == "__main__":  # allow excute when file run as script
-    socketio.run(app, port=8000, debug=True)
+    # socketio.run(app, port=8000, debug=True)
+    app.run(debug=True, port=8000)
