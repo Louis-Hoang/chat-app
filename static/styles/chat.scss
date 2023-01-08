@@ -10,7 +10,7 @@
         overflow: hidden; /* Makee this div contain its floated children */
         width: 100%;
         #sidebar {
-            margin-top: 2em;
+            margin-top: 3em;
             float: left; /* Make this div as wide as its contents */
             min-height: 96vh;
             padding-left: 1em;
@@ -20,8 +20,11 @@
             .select-room {
                 cursor: pointer;
             }
+            .active-room {
+                background-color: #ffc107;
+            }
             p {
-                padding-left: 2em;
+                padding-left: 1em;
                 padding-right: 2em;
                 &:hover {
                     background-color: #ffc107;
@@ -37,7 +40,8 @@
         #rightside-panel {
             overflow: hidden;
             #display-message-section {
-                margin-top: 5em;
+                margin-top: 6em;
+                margin-left: 1em;
                 min-height: 82vh;
                 max-height: 82vh;
                 overflow-y: auto; /*Make  this section scrolable */
@@ -49,8 +53,22 @@
             }
         }
     }
+    .navbar {
+        .container-fluid {
+        }
+    }
+    .nav-link {
+        &:hover {
+            background-color: red !important;
+        }
+    }
 }
 
+.navbar-light .navbar-nav .nav-link {
+    &:hover {
+        background-color: red !important;
+    }
+}
 @keyframes fadeIn {
     0% {
         opacity: 0;

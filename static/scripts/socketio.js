@@ -1,27 +1,10 @@
 jQuery(document).ready(() => {
     var socket = io();
-    let room = "general";
-    joinRoom("general");
+    let room = "General";
+    joinRoom("General");
 
     // Display message
     socket.on("message", (data) => {
-        // const p = document.createElement("p");
-        // const span_username = document.createElement("span");
-        // const span_timestamp = document.createElement("span");
-        // const br = document.createElement("br");
-        // if (data.username) {
-        //     span_username.innerHTML = data.username;
-        //     span_timestamp.innerHTML = data.time_stamp;
-        //     p.innerHTML =
-        //         span_username.outerHTML +
-        //         br.outerHTML +
-        //         data.msg +
-        //         br.outerHTML +
-        //         span_timestamp.outerHTML;
-        //     document.querySelector("#display-message-section").append(p);
-        // } else {
-        //     printSysMsg(data.msg);
-        // }
         const text_msg = jQuery("<p class='chat-msg'></p>");
         const span_username = jQuery("<span class='username-msg'></span>");
         const span_timestamp = jQuery("<span class='time-msg'></span>");
@@ -42,19 +25,6 @@ jQuery(document).ready(() => {
         }
     });
 
-    // Send message
-    // document.querySelector("#send-message").onclick = () => {
-    //     str = document.querySelector("#user-message").value;
-    //     if (!(str.length == 0 || str.replace(/\s/g, "").length == 0)) {
-    //         socket.send({
-    //             msg: document.querySelector("#user-message").value,
-    //             username: username,
-    //             room: room,
-    //         });
-    //         document.querySelector("#user-message").value = null;
-    //     }
-    // };
-
     jQuery("#send-message").click(function () {
         str = jQuery("#user-message").val();
         if (!(str.length == 0 || str.replace(/\s/g, "").length == 0)) {
@@ -67,41 +37,53 @@ jQuery(document).ready(() => {
         }
     });
 
-    // Room selection
-    // document.querySelectorAll(".select-room").forEach((p) => {
-    //     p.onclick = () => {
-    //         let newRoom = p.innerHTML;
-    //         if (newRoom == room) {
-    //             msg = `You are already in the ${room} room.`;
-    //             printSysMsg(msg);
-    //         } else {
-    //             leaveRoom(room);
-    //             joinRoom(newRoom);
-    //             room = newRoom; //update room
-    //         }
-    //     };
-    // });
+    let msg_display = false; //avoid duplicate noti
 
     jQuery(".select-room").each((index) => {
-        $(".select-room")
+        jQuery(".select-room")
             .eq(index)
             .on("click", function () {
                 let newRoom = $(".select-room").eq(index).text();
-                if (newRoom == room) {
-                    msg = `You are already in the ${room} room.`;
-                    printSysMsg(msg);
-                } else {
+                if (newRoom != room) {
                     leaveRoom(room);
                     joinRoom(newRoom);
-                    room = newRoom; //update room
+                    room = newRoom;
+                    msg_display = false; //update room
+                } else {
+                    msg = `You are already in the ${room} room.`;
+                    if (!msg_display) {
+                        printSysMsg(msg);
+                        msg_display = true;
+                    }
                 }
             });
     });
+
+    // function select_room(event) {
+    //     let newRoom = $(".select-room").eq(event.data.index).text();
+    //     if (newRoom == room) {
+    //         msg = `You are already in the ${room} room.`;
+    //         printSysMsg(msg);
+    //         jQuery(".select-room").eq(event.data.index).unbind("click");
+    //     } else {
+    //         jQuery("#General").bind("click", select_room);
+    //         leaveRoom(room);
+    //         joinRoom(newRoom);
+    //         room = newRoom; //update room
+    //     }
+    // }
+
+    // jQuery(".select-room").each((room_num) => {
+    //     jQuery(".select-room")
+    //         .eq(room_num)
+    //         .on("click", { index: room_num }, select_room);
+    // });
 
     //Leave room func
 
     function leaveRoom(room) {
         socket.emit("leave", { username: username, room: room });
+        jQuery(`#${room}`).removeClass("active-room");
     }
 
     //Leave join func
@@ -110,6 +92,7 @@ jQuery(document).ready(() => {
         socket.emit("join", { username: username, room: room });
         jQuery("#display-message-section").html("");
         jQuery("#user-message").focus();
+        jQuery(`#${room}`).addClass("active-room");
     }
 
     //Print system message

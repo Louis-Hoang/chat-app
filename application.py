@@ -17,7 +17,7 @@ db = SQLAlchemy(app)
 
 # Init SocketIO
 socketio = SocketIO(app, manage_session=False)
-ROOMS = ['general', "outdoor", "film", "game", "study"]
+ROOMS = ['General', "Outdoor", "Film", "Game", "Study"]
 
 
 # Config Flask login

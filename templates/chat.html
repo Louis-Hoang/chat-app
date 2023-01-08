@@ -46,7 +46,7 @@
             <nav id="sidebar">
                 <h4>Rooms</h4>
                 {% for room in rooms %}
-                    <p id="{{ room|title }}" class="select-room">{{ room|title }}</p>
+                    <p id="{{ room|title }}" class="select-room {{room}}-room">{{ room|title }}</p>
                 {% endfor %}
             </nav>
 
