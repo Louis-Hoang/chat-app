@@ -115,7 +115,6 @@ jQuery(document).ready(() => {
     //Print system message
 
     function printSysMsg(msg) {
-        s;
         const noti = jQuery("<p></p>");
         noti.text(msg);
         jQuery("#display-message-section").append(noti);
