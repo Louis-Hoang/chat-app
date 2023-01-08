@@ -4,21 +4,39 @@ jQuery(document).ready(() => {
     joinRoom("General");
 
     // Display message
+    // socket.on("message", (data) => {
+    //     const text_msg = jQuery("<p class='chat-msg'></p>");
+    //     const span_username = jQuery("<span class='username-msg'></span>");
+    //     const span_timestamp = jQuery("<span class='time-msg'></span>");
+    //     const br = jQuery("<br></br>");
+    //     if (data.username) {
+    //         span_username.text(data.username);
+    //         span_timestamp.text(data.time_stamp);
+    //         var content =
+    //             span_username.prop("outerHTML") +
+    //             br.prop("outerHTML") +
+    //             data.msg +
+    //             br.prop("outerHTML") +
+    //             span_timestamp.prop("outerHTML");
+    //         text_msg.html(content);
+    //         jQuery("#display-message-section").append(text_msg);
+    //     } else {
+    //         printSysMsg(data.msg);
+    //     }
+    // });
+
     socket.on("message", (data) => {
         const text_msg = jQuery("<p class='chat-msg'></p>");
-        const span_username = jQuery("<span class='username-msg'></span>");
-        const span_timestamp = jQuery("<span class='time-msg'></span>");
-        const br = jQuery("<br></br>");
+        const span_username = jQuery("<div class='username-msg'></div>");
+        const span_timestamp = jQuery("<div class='time-msg'></div>");
+        const user_info = jQuery("<div class='user-info'></div>");
+        user_info.append(span_username, span_timestamp);
+
         if (data.username) {
             span_username.text(data.username);
             span_timestamp.text(data.time_stamp);
-            var content =
-                span_username.prop("outerHTML") +
-                br.prop("outerHTML") +
-                data.msg +
-                br.prop("outerHTML") +
-                span_timestamp.prop("outerHTML");
-            text_msg.html(content);
+            text_msg.text(data.msg);
+            jQuery("#display-message-section").append(user_info);
             jQuery("#display-message-section").append(text_msg);
         } else {
             printSysMsg(data.msg);
@@ -58,26 +76,6 @@ jQuery(document).ready(() => {
                 }
             });
     });
-
-    // function select_room(event) {
-    //     let newRoom = $(".select-room").eq(event.data.index).text();
-    //     if (newRoom == room) {
-    //         msg = `You are already in the ${room} room.`;
-    //         printSysMsg(msg);
-    //         jQuery(".select-room").eq(event.data.index).unbind("click");
-    //     } else {
-    //         jQuery("#General").bind("click", select_room);
-    //         leaveRoom(room);
-    //         joinRoom(newRoom);
-    //         room = newRoom; //update room
-    //     }
-    // }
-
-    // jQuery(".select-room").each((room_num) => {
-    //     jQuery(".select-room")
-    //         .eq(room_num)
-    //         .on("click", { index: room_num }, select_room);
-    // });
 
     //Leave room func
 

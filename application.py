@@ -82,13 +82,19 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 
+@app.after_request #no cache
+def after_request(response):
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
+
+
 
 @socketio.on('message')
 def message(data):
     msg = data["msg"]
     username = data["username"]
     room = data["room"]
-    time_stamp = time.strftime('%b-%d %I:%M%p', time.localtime())
+    time_stamp = time.strftime('%m/%d/%Y %I:%M %p', time.localtime())
     send({'msg': data['msg'], 'username': data['username'], 'room': data['room'], 'time_stamp': time_stamp}, room=room)
     
 

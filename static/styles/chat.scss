@@ -21,8 +21,13 @@
 
             .nav-item {
                 transition: 0.2s ease-in-out;
-                &:hover {
-                    font-weight: bold;
+                #logout-btn {
+                    span {
+                        font-size: 1.2em;
+                    }
+                    &:hover {
+                        font-weight: bold;
+                    }
                 }
             }
         }
@@ -79,6 +84,23 @@
                 min-height: 82vh;
                 max-height: 82vh;
                 overflow-y: auto; /*Make  this section scrolable */
+                .user-info {
+                    display: flex;
+                    flex-direction: row;
+                    gap: 10px;
+                    align-items: flex-end;
+                    margin-bottom: 5px;
+                    .username-msg {
+                        font-size: 1.2em;
+                        margin-bottom: 0;
+                        transform: translateY(2px);
+                    }
+                    .time-msg {
+                        font-size: 0.85em;
+                        margin-bottom: 0;
+                        color: grey;
+                    }
+                }
             }
             #input-area {
                 padding-left: 1em;
