@@ -5,8 +5,13 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Document</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+        <!-- Custom css for chat pages -->
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/chat.css') }}">
     </head>
     <body>
+        <div class="wrapper">
         <!-- Navigation bar -->
         <nav></nav>
         <div id="main-section">
@@ -35,13 +40,13 @@
                 </div>
             </div>
         </div>
-
+        </div>
         <script type="text/javascript">
             const username = `{{username}}`;
         </script>
 
         <!--Custom chat JS -->
-        <script  src="{{ url_for('static', filename='scripts/chat_page.js') }}""></script>
+        <!-- <script  src="{{ url_for('static', filename='scripts/chat_page.js') }}""></script> -->
         <!-- SocketIO JS  -->
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
@@ -50,6 +55,11 @@
         ></script>
 
         <!-- Custom SocketIO -->
-        <script src="{{ url_for('static', filename='scripts/socketio.js') }}"></script>
+        
     </body>
+
+    <!-- jQuery w/ socketIO JS & custom-chat JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script  src="{{ url_for('static', filename='scripts/chat_page.js') }}""></script>
+    <script src="{{ url_for('static', filename='scripts/socketio.js') }}"></script>
 </html>

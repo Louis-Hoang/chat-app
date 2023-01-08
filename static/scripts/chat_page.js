@@ -1,9 +1,9 @@
-document.addEventListener("DOMContentLoaded", () => {
-    let msg = document.querySelector("#user-message");
-    msg.addEventListener("keyup", (event) => {
-        event.preventDefault();
-        if (event.keyCode === 13) {
-            document.querySelector("#send-message").click();
-        } //enter button
+$(document).ready(() => {
+    $("#user-message").keyup((event) => {
+        var code = event.key;
+        if (code === "Enter") {
+            $("#send-message").click();
+            event.preventDefault();
+        }
     });
 });
