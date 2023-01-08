@@ -18,7 +18,7 @@
         {% endwith %}
         <div class="wrapper">
         <!-- Navigation bar -->
-        <nav class="navbar navbar-expand-sm navbar-light fixed-top" style="background-color: #66a1ee">
+        <!-- <nav class="navbar navbar-expand-sm navbar-light fixed-top" style="background-color: #66a1ee">
 
                 <div class="container-fluid">
                     <div id="show-sidebar-button" class="cursor-pointer">
@@ -37,8 +37,20 @@
                         </ul>
                     </div>
                 </div>
-        </nav>
+        </nav> -->
         <!-- Nav bar end -->
+        
+
+        <!-- Navigation bar -->
+        <div class="header">
+            <nav class="custom-navbar sticky">
+                <div class="nav-item">
+                    <a id="logout-btn" class="nav-link" href="{{ url_for('logout') }}"><span style="color: #335177">Logout</span></a>
+                </div>
+            </nav>
+        </div>
+        <!-- Nav bar end -->
+
 
         <!-- Main section -->
         <div id="main-section">

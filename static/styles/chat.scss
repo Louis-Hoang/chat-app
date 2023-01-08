@@ -1,5 +1,39 @@
 .wrapper {
     display: flex;
+    flex-direction: column;
+    .header {
+        transition: opacity 2.5s ease-in-out;
+        transition-delay: 0.75s;
+        transition-duration: 0.2s;
+        .custom-navbar {
+            align-items: center;
+            background: transparent;
+            display: flex;
+            justify-content: flex-end;
+            flex-direction: row;
+            left: 0;
+            letter-spacing: 1px;
+            padding: 2% 5%;
+            position: fixed;
+            right: 0;
+            transition: 0.3s ease-in-out;
+            z-index: 1030;
+
+            .nav-item {
+                transition: 0.2s ease-in-out;
+                &:hover {
+                    font-weight: bold;
+                }
+            }
+        }
+        .sticky {
+            background: #eae8e1;
+            box-shadow: 0.2px 0.5px 0.5px #f5fefd;
+            opacity: 1;
+            padding: 8px 5%;
+            transition: 0.3s ease-in-out;
+        }
+    }
     #show-sidebar-button {
         visibility: hidden;
         opacity: 0;
@@ -10,7 +44,7 @@
         overflow: hidden; /* Makee this div contain its floated children */
         width: 100%;
         #sidebar {
-            margin-top: 3em;
+            margin-top: 2em;
             float: left; /* Make this div as wide as its contents */
             min-height: 96vh;
             padding-left: 1em;
@@ -40,7 +74,7 @@
         #rightside-panel {
             overflow: hidden;
             #display-message-section {
-                margin-top: 6em;
+                margin-top: 5.2em;
                 margin-left: 1em;
                 min-height: 82vh;
                 max-height: 82vh;
@@ -51,15 +85,6 @@
                 padding-right: 1em;
                 bottom: 0;
             }
-        }
-    }
-    .navbar {
-        .container-fluid {
-        }
-    }
-    .nav-link {
-        &:hover {
-            background-color: red !important;
         }
     }
 }
