@@ -3,28 +3,6 @@ jQuery(document).ready(() => {
     let room = "General";
     joinRoom("General");
 
-    // Display message
-    // socket.on("message", (data) => {
-    //     const text_msg = jQuery("<p class='chat-msg'></p>");
-    //     const span_username = jQuery("<span class='username-msg'></span>");
-    //     const span_timestamp = jQuery("<span class='time-msg'></span>");
-    //     const br = jQuery("<br></br>");
-    //     if (data.username) {
-    //         span_username.text(data.username);
-    //         span_timestamp.text(data.time_stamp);
-    //         var content =
-    //             span_username.prop("outerHTML") +
-    //             br.prop("outerHTML") +
-    //             data.msg +
-    //             br.prop("outerHTML") +
-    //             span_timestamp.prop("outerHTML");
-    //         text_msg.html(content);
-    //         jQuery("#display-message-section").append(text_msg);
-    //     } else {
-    //         printSysMsg(data.msg);
-    //     }
-    // });
-
     socket.on("message", (data) => {
         const text_msg = jQuery("<p class='chat-msg'></p>");
         const span_username = jQuery("<div class='username-msg'></div>");
@@ -47,13 +25,24 @@ jQuery(document).ready(() => {
         str = jQuery("#user-message").val();
         if (!(str.length == 0 || str.replace(/\s/g, "").length == 0)) {
             socket.send({
-                msg: document.querySelector("#user-message").value,
+                msg: str,
                 username: username,
                 room: room,
             });
             jQuery("input").val(null);
         }
     });
+
+    // Test
+    // jQuery("#new-room").click(function () {
+    //     str = jQuery("#newroom-name").val();
+    //     if (!(str.length == 0 || str.replace(/\s/g, "").length == 0)) {
+    //         socket.emit("newroom", { username: username, room: str });
+    //         jQuery("input").val(null);
+    //     }
+    // });
+
+    //Test end
 
     let msg_display = false; //avoid duplicate noti
 

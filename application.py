@@ -98,6 +98,16 @@ def message(data):
     send({'msg': data['msg'], 'username': data['username'], 'room': data['room'], 'time_stamp': time_stamp}, room=room)
     
 
+
+# @socketio.on('newroom')
+# def newroom(data):
+#     #User join room
+#     username = data["username"]
+#     room = data["room"]
+#     join_room(room)
+#     send({'msg': username + " has joined the " + room + " room."}, room=room)
+
+
 @socketio.on('join')
 def join(data):
     #User join room
