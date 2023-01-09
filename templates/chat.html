@@ -43,7 +43,7 @@
                 <h4>People</h4>
                 {% for person in user_list %}
                     {% if user_list[person] != username %}
-                        <p id="{{ user_list[person]|title }}" class="select-person {{user_list[person]}}-person">{{ user_list[person]|title }}</p>
+                        <p id="{{ user_list[person] }}" class="select-person {{user_list[person]}}">{{ user_list[person] }}</p>
                     {% endif %}
                 {% endfor %}
             </nav>

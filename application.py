@@ -99,18 +99,13 @@ def after_request(response):
 
 
 @socketio.on('message')
-def message(data, isChannel):
-    if (isChannel):
-        msg = data["msg"]
-        username = data["username"]
-        room = data["room"]
-        time_stamp = time.strftime('%m/%d/%Y %I:%M %p', time.localtime())
-        send({'msg': data['msg'], 'username': data['username'], 'room': data['room'], 'time_stamp': time_stamp}, room=room)
-    else:
-        msg = data["msg"]
-        username = data["username"]
-        time_stamp = time.strftime('%m/%d/%Y %I:%M %p', time.localtime())
-        message['from'] = request.sid
+def message(data):
+    msg = data["msg"]
+    username = data["username"]
+    room = data["room"]
+    time_stamp = time.strftime('%m/%d/%Y %I:%M %p', time.localtime())
+    send({'msg': data['msg'], 'username': data['username'], 'room': data['room'], 'time_stamp': time_stamp}, room=room)
+    
 
 
 
