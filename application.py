@@ -18,7 +18,7 @@ db = SQLAlchemy(app)
 # Init SocketIO
 socketio = SocketIO(app, manage_session=False)
 ROOMS = ['General', "Outdoor", "Film", "Game", "Study"]
-
+USERS = {}
 
 # Config Flask login
 login = LoginManager(app)
@@ -54,15 +54,23 @@ def login():
     login_form = LoginForm()
     # Allow login if validation through
     if login_form.validate_on_submit():
-        user_object = User.query.filter_by(
-            username=login_form.username.data).first()
-        login_user(user_object)
-        return redirect(url_for('chat'))
+        if not (login_form.username.data in USERS.values()): #prevent multiple log in  
+            user_object = User.query.filter_by(
+                username=login_form.username.data).first()
+            login_user(user_object)
+            USERS[current_user.id] = current_user.username 
+            print(USERS)
+            socketio.emit("new-user",{'id': current_user.id , 'username':current_user.username})
+            return redirect(url_for('chat'))
+        else:
+            flash('Account already log in', 'danger')
+            return redirect(url_for('login'))
 
     return render_template("login.html", form=login_form)
 
 @app.route("/logout", methods=["GET"])
 def logout():
+    USERS.pop(current_user.id,'No user found')
     logout_user()
     flash('Log out successfully', 'success')
     return redirect(url_for('login'))
@@ -73,7 +81,8 @@ def chat():
     if not current_user.is_authenticated:
         flash('Please login', 'danger')
         return redirect(url_for('login'))
-    return render_template("chat.html", username = current_user.username, rooms=ROOMS)
+    #store logged in users
+    return render_template("chat.html", username = current_user.username, rooms=ROOMS, user_list = USERS)
 
 
 @app.errorhandler(404)
@@ -90,13 +99,19 @@ def after_request(response):
 
 
 @socketio.on('message')
-def message(data):
-    msg = data["msg"]
-    username = data["username"]
-    room = data["room"]
-    time_stamp = time.strftime('%m/%d/%Y %I:%M %p', time.localtime())
-    send({'msg': data['msg'], 'username': data['username'], 'room': data['room'], 'time_stamp': time_stamp}, room=room)
-    
+def message(data, isChannel):
+    if (isChannel):
+        msg = data["msg"]
+        username = data["username"]
+        room = data["room"]
+        time_stamp = time.strftime('%m/%d/%Y %I:%M %p', time.localtime())
+        send({'msg': data['msg'], 'username': data['username'], 'room': data['room'], 'time_stamp': time_stamp}, room=room)
+    else:
+        msg = data["msg"]
+        username = data["username"]
+        time_stamp = time.strftime('%m/%d/%Y %I:%M %p', time.localtime())
+        message['from'] = request.sid
+
 
 
 # @socketio.on('newroom')
@@ -114,6 +129,7 @@ def join(data):
     username = data["username"]
     room = data["room"]
     join_room(room)
+    
     send({'msg': username + " has joined the " + room + " room."}, room=room)
 
 

@@ -17,28 +17,8 @@
             {% endif %}
         {% endwith %}
         <div class="wrapper">
-        <!-- Navigation bar -->
-        <!-- <nav class="navbar navbar-expand-sm navbar-light fixed-top" style="background-color: #66a1ee">
-
-                <div class="container-fluid">
-                    <div id="show-sidebar-button" class="cursor-pointer">
-                        <i class="fas fa-plus-circle "></i>
-                        <span>Rooms</span>
-                    </div>
-
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <ul class="navbar-nav ml-auto">
-                            <li class="nav-item">
-                                <a id="logout-btn" class="nav-link" href="{{ url_for('logout') }}"><span style="color: #335177">Logout</span></a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-        </nav> -->
-        <!-- Nav bar end -->
+        
+        <!-- <div class="dummy-id">{{id}}</div> -->
         
 
         <!-- Navigation bar -->
@@ -60,8 +40,14 @@
                 {% for room in rooms %}
                     <p id="{{ room|title }}" class="select-room {{room}}-room">{{ room|title }}</p>
                 {% endfor %}
+                <h4>People</h4>
+                {% for person in user_list %}
+                    {% if user_list[person] != username %}
+                        <p id="{{ user_list[person]|title }}" class="select-person {{user_list[person]}}-person">{{ user_list[person]|title }}</p>
+                    {% endif %}
+                {% endfor %}
             </nav>
-
+<!-- 
             <!-- Message area -->
             <div id="rightside-panel">
                 <!-- Display message -->

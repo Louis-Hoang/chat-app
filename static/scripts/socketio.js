@@ -21,6 +21,13 @@ jQuery(document).ready(() => {
         }
     });
 
+    socket.on("new-user", (data) => {
+        const dummy = jQuery("<p></p>");
+        dummy.text(data.username);
+        jQuery("#sidebar").append(dummy);
+        // console.log(data.username);
+    });
+
     jQuery("#send-message").click(function () {
         str = jQuery("#user-message").val();
         if (!(str.length == 0 || str.replace(/\s/g, "").length == 0)) {
