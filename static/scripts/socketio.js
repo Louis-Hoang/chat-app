@@ -1,3 +1,12 @@
+const initialMessages = {
+    General: [],
+    Outdoor: [],
+    Film: [],
+    Game: [],
+    Study: [],
+};
+
+function sendMessage() {}
 jQuery(document).ready(() => {
     var socket = io();
     let room = "General";
@@ -21,12 +30,12 @@ jQuery(document).ready(() => {
         }
     });
 
-    socket.on("new-user", (data) => {
-        const dummy = jQuery("<p></p>");
-        dummy.text(data.username);
-        jQuery("#sidebar").append(dummy);
-        // console.log(data.username);
-    });
+    // socket.on("new-user", (data) => {
+    //     const dummy = jQuery("<p></p>");
+    //     dummy.text(data.username);
+    //     jQuery("#sidebar").append(dummy);
+    //     // console.log(data.username);
+    // });
 
     jQuery("#send-message").click(function () {
         str = jQuery("#user-message").val();

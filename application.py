@@ -2,7 +2,7 @@ import os
 import time
 from flask import Flask, render_template, redirect, request, url_for, flash
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
-from flask_socketio import SocketIO, send, emit, join_room, leave_room
+from flask_socketio import SocketIO, send, emit, join_room, leave_room, disconnect
 from wtform_fields import *
 from models import *
 
@@ -18,7 +18,14 @@ db = SQLAlchemy(app)
 # Init SocketIO
 socketio = SocketIO(app, manage_session=False)
 ROOMS = ['General', "Outdoor", "Film", "Game", "Study"]
-USERS = {}
+messages = {
+    "General" :[],
+    "Outdoor": [],
+    "Film": [],
+    "Game": [],
+    "Study": []
+}
+USERS = [{'username':'', 'id':''}]
 
 # Config Flask login
 login = LoginManager(app)
@@ -54,13 +61,11 @@ def login():
     login_form = LoginForm()
     # Allow login if validation through
     if login_form.validate_on_submit():
-        if not (login_form.username.data in USERS.values()): #prevent multiple log in  
+        if not any(dict['username']==login_form.username.data for dict in USERS): 
+            #prevent multiple log in  
             user_object = User.query.filter_by(
-                username=login_form.username.data).first()
+            username=login_form.username.data).first()
             login_user(user_object)
-            USERS[current_user.id] = current_user.username 
-            print(USERS)
-            socketio.emit("new-user",{'id': current_user.id , 'username':current_user.username})
             return redirect(url_for('chat'))
         else:
             flash('Account already log in', 'danger')
@@ -70,7 +75,7 @@ def login():
 
 @app.route("/logout", methods=["GET"])
 def logout():
-    USERS.pop(current_user.id,'No user found')
+    # USERS.pop(current_user.id,'No user found')
     logout_user()
     flash('Log out successfully', 'success')
     return redirect(url_for('login'))
@@ -98,24 +103,32 @@ def after_request(response):
 
 
 
-@socketio.on('message')
+@socketio.on('connect')
+def connect_handler():
+    if current_user.is_authenticated:
+        user_data = {'username':current_user.username, 'id':request.sid}
+        # socketio.emit('new-user',user_data, broadcast=True)
+        USERS.append(user_data)
+    else:
+        return False  # not allowed here
+
+
+@socketio.on('message') #Fix username in isChannel;
 def message(data):
     msg = data["msg"]
     username = data["username"]
     room = data["room"]
     time_stamp = time.strftime('%m/%d/%Y %I:%M %p', time.localtime())
-    send({'msg': data['msg'], 'username': data['username'], 'room': data['room'], 'time_stamp': time_stamp}, room=room)
-    
+    payload = {'msg': data['msg'], 'username': data['username'], 'room': data['room'], 'time_stamp': time_stamp}
+    send(payload, room=room)
+    messages[room].append(payload)
+    # print(messages)
 
+# @socketio.on("disconnect")
+# def disconnect():
+#     USERS = [d for d in USERS if d["id"] != request.sid]
+#     socketio.emit("new user", USERS)
 
-
-# @socketio.on('newroom')
-# def newroom(data):
-#     #User join room
-#     username = data["username"]
-#     room = data["room"]
-#     join_room(room)
-#     send({'msg': username + " has joined the " + room + " room."}, room=room)
 
 
 @socketio.on('join')
@@ -125,6 +138,8 @@ def join(data):
     room = data["room"]
     join_room(room)
     
+    for d in messages[room]:
+        send ({'msg': d["msg"], 'username': d["username"], 'time_stamp': d["time_stamp"] })
     send({'msg': username + " has joined the " + room + " room."}, room=room)
 
 
