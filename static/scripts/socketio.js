@@ -82,6 +82,9 @@ jQuery(document).ready(() => {
             });
     });
 
+    jQuery("#logout-btn").on("click", () => {
+        socket.emit("logout", { username: username });
+    });
     //Leave room func
 
     function leaveRoom(room) {

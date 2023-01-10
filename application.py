@@ -107,8 +107,8 @@ def after_request(response):
 def connect_handler():
     if current_user.is_authenticated:
         user_data = {'username':current_user.username, 'id':request.sid}
-        # socketio.emit('new-user',user_data, broadcast=True)
         USERS.append(user_data)
+
     else:
         return False  # not allowed here
 
@@ -137,7 +137,6 @@ def join(data):
     username = data["username"]
     room = data["room"]
     join_room(room)
-    
     for d in messages[room]:
         send ({'msg': d["msg"], 'username': d["username"], 'time_stamp': d["time_stamp"] })
     send({'msg': username + " has joined the " + room + " room."}, room=room)
@@ -150,6 +149,13 @@ def leave(data):
     room = data["room"]
     leave_room(room)
     send({'msg': username + " has left the " + room + " room."}, room=room)
+
+
+@socketio.on("logout")
+def logout(data):
+    global USERS
+    USERS = [d for d in USERS if d["id"] != request.sid]
+
 
 if __name__ == "__main__":  # allow excute when file run as script
     # socketio.run(app, port=8000, debug=True)
