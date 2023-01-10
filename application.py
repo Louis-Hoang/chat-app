@@ -25,7 +25,7 @@ messages = {
     "Game": [],
     "Study": []
 }
-USERS = [{'username':'', 'id':''}]
+USERS = []
 
 # Config Flask login
 login = LoginManager(app)
@@ -66,6 +66,7 @@ def login():
             user_object = User.query.filter_by(
             username=login_form.username.data).first()
             login_user(user_object)
+            socketio.emit("reset-user")
             return redirect(url_for('chat'))
         else:
             flash('Account already log in', 'danger')
@@ -106,9 +107,13 @@ def after_request(response):
 @socketio.on('connect')
 def connect_handler():
     if current_user.is_authenticated:
-        user_data = {'username':current_user.username, 'id':request.sid}
-        USERS.append(user_data)
-
+        duplicate = False
+        for user in USERS:
+            if user['username'] == current_user.username:
+                duplicate = True
+        if not (duplicate):
+            user_data = {'username':current_user.username, 'id':request.sid}
+            USERS.append(user_data)
     else:
         return False  # not allowed here
 
@@ -124,10 +129,7 @@ def message(data):
     messages[room].append(payload)
     # print(messages)
 
-# @socketio.on("disconnect")
-# def disconnect():
-#     USERS = [d for d in USERS if d["id"] != request.sid]
-#     socketio.emit("new user", USERS)
+
 
 
 
@@ -149,13 +151,14 @@ def leave(data):
     room = data["room"]
     leave_room(room)
     send({'msg': username + " has left the " + room + " room."}, room=room)
+    
 
 
 @socketio.on("logout")
 def logout(data):
     global USERS
     USERS = [d for d in USERS if d["id"] != request.sid]
-
+    socketio.emit("reset-user");
 
 if __name__ == "__main__":  # allow excute when file run as script
     # socketio.run(app, port=8000, debug=True)

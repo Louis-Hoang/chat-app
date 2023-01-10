@@ -25,6 +25,9 @@
         <div class="header">
             <nav class="custom-navbar sticky">
                 <div class="nav-item">
+                    <div class="username">You are logged in as {{username}}</div>
+                </div>
+                <div class="nav-item">
                     <a id="logout-btn" class="nav-link" href="{{ url_for('logout') }}"><span style="color: #335177">Logout</span></a>
                 </div>
             </nav>
@@ -42,8 +45,8 @@
                 {% endfor %}
                 <h4>People</h4>
                 {% for person in user_list %}
-                    {% if user_list[person] != username %}
-                        <p id="{{ user_list[person] }}" class="select-person {{user_list[person]}}">{{ user_list[person] }}</p>
+                    {% if person['username'] != username %}
+                        <p id="{{ person['username'] }}" class="select-person {{person['username']}}">{{ person['username'] }}</p>
                     {% endif %}
                 {% endfor %}
             </nav>

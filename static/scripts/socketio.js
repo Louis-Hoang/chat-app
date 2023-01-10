@@ -30,12 +30,9 @@ jQuery(document).ready(() => {
         }
     });
 
-    // socket.on("new-user", (data) => {
-    //     const dummy = jQuery("<p></p>");
-    //     dummy.text(data.username);
-    //     jQuery("#sidebar").append(dummy);
-    //     // console.log(data.username);
-    // });
+    socket.on("reset-user", () => {
+        location.reload();
+    });
 
     jQuery("#send-message").click(function () {
         str = jQuery("#user-message").val();
