@@ -114,21 +114,10 @@ def after_request(response):
     return response
 
 
+@app.teardown_appcontext #bottleneck
+def shutdown_session(exception=None):
+    db.session.remove()
 
-# @socketio.on('connect')
-# def connect_handler():
-#     if current_user.is_authenticated:
-#         # duplicate = False
-#         # for user in USERS:
-#         #     if user['username'] == current_user.username:
-#         #         duplicate = True
-#         # if not (duplicate):
-#         #     # user_data = {'username':current_user.username, 'id':request.sid}
-#         #     user_data = {'username':current_user.username}
-#         #     USERS.append(user_data)
-#         return True
-#     else:
-#         return False  # not allowed here
 
 @socketio.on("request-private")
 def send_list():
