@@ -1,11 +1,3 @@
-const initialMessages = {
-    General: [],
-    Outdoor: [],
-    Film: [],
-    Game: [],
-    Study: [],
-};
-
 function sendMessage() {}
 jQuery(document).ready(() => {
     var socket = io();
@@ -31,7 +23,8 @@ jQuery(document).ready(() => {
     });
 
     socket.on("reset-user", () => {
-        location.reload();
+        window.location.reload();
+        console.log("im reload");
     });
 
     jQuery("#send-message").click(function () {
@@ -46,15 +39,6 @@ jQuery(document).ready(() => {
         }
     });
 
-    // Test
-    // jQuery("#new-room").click(function () {
-    //     str = jQuery("#newroom-name").val();
-    //     if (!(str.length == 0 || str.replace(/\s/g, "").length == 0)) {
-    //         socket.emit("newroom", { username: username, room: str });
-    //         jQuery("input").val(null);
-    //     }
-    // });
-
     //Test end
 
     let msg_display = false; //avoid duplicate noti
@@ -63,7 +47,7 @@ jQuery(document).ready(() => {
         jQuery(".select-room")
             .eq(index)
             .on("click", function () {
-                let newRoom = $(".select-room").eq(index).text();
+                let newRoom = jQuery(".select-room").eq(index).text();
                 if (newRoom != room) {
                     leaveRoom(room);
                     joinRoom(newRoom);
@@ -79,6 +63,69 @@ jQuery(document).ready(() => {
             });
     });
 
+    // jQuery(".select-room").each((index) => {
+    //     jQuery(".select-room")
+    //         .eq(index)
+    //         .on("click", () => {
+
+    //         });
+    // });
+
+    if (jQuery(".select-person").length) {
+        jQuery(".select-person").each((index) => {
+            jQuery(".select-person")
+                .eq(index)
+                .on("click", () => {
+                    socket.emit("request-private");
+                    socket.on("chat-list", (data) => {
+                        let private_chat = data;
+                        //
+                        let bool = false;
+                        receiver = jQuery(".select-person")
+                            .eq(index)
+                            .attr("id");
+                        for (const elem of private_chat) {
+                            if (
+                                elem.includes(username) &&
+                                elem.includes(receiver)
+                            ) {
+                                leaveRoom(room);
+                                socket.emit("private-chat", {
+                                    user1: username, //sender
+                                    user2: receiver, //receiver
+                                });
+                                bool = true;
+                                room = elem;
+                                console.log("case 1");
+                                break;
+                            }
+                        }
+                        if (!bool) {
+                            newRoom = username + "-" + receiver;
+                            if (!private_chat.includes(newRoom)) {
+                                private_chat.push(newRoom);
+                            }
+                            leaveRoom(room);
+                            socket.emit("private-chat", {
+                                user1: username, //sender
+                                user2: receiver, //receiver
+                            });
+                            room = newRoom;
+                            console.log("case 2");
+                            // console.log(private_chat);
+                        }
+                        jQuery("#display-message-section").html("");
+                        jQuery("#user-message").focus();
+                        jQuery(".select-person")
+                            .eq(index)
+                            .addClass("active-chat");
+                    });
+
+                    console.log(`${username} have joined ${room}`);
+                });
+        });
+    }
+
     jQuery("#logout-btn").on("click", () => {
         socket.emit("logout", { username: username });
     });
@@ -86,7 +133,7 @@ jQuery(document).ready(() => {
 
     function leaveRoom(room) {
         socket.emit("leave", { username: username, room: room });
-        jQuery(`#${room}`).removeClass("active-room");
+        jQuery(".active-chat").removeClass("active-chat");
     }
 
     //Leave join func
@@ -95,7 +142,7 @@ jQuery(document).ready(() => {
         socket.emit("join", { username: username, room: room });
         jQuery("#display-message-section").html("");
         jQuery("#user-message").focus();
-        jQuery(`#${room}`).addClass("active-room");
+        jQuery(`#${room}`).addClass("active-chat");
     }
 
     //Print system message

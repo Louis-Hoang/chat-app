@@ -25,7 +25,8 @@ messages = {
     "Game": [],
     "Study": []
 }
-USERS = []
+USERS = [] #Migrate this to a dict {'username':'id'}
+private_chat = []
 
 # Config Flask login
 login = LoginManager(app)
@@ -78,6 +79,7 @@ def login():
 def logout():
     # USERS.pop(current_user.id,'No user found')
     logout_user()
+    socketio.emit("reset-user");
     flash('Log out successfully', 'success')
     return redirect(url_for('login'))
 
@@ -117,6 +119,10 @@ def connect_handler():
     else:
         return False  # not allowed here
 
+@socketio.on("request-private")
+def send_list():
+    socketio.emit("chat-list", private_chat)
+
 
 @socketio.on('message') #Fix username in isChannel;
 def message(data):
@@ -126,9 +132,25 @@ def message(data):
     time_stamp = time.strftime('%m/%d/%Y %I:%M %p', time.localtime())
     payload = {'msg': data['msg'], 'username': data['username'], 'room': data['room'], 'time_stamp': time_stamp}
     send(payload, room=room)
-    messages[room].append(payload)
+    if room in messages:
+        messages[room].append(payload)
     # print(messages)
 
+
+@socketio.on("private-chat")
+def private(data):
+    founded = False
+    for chat in private_chat:
+        if (data['user1'] in chat and data['user2'] in chat):
+            founded = True
+            join_room(chat)
+            break 
+    if not founded:
+        someString = data['user1']+ "-" + data['user2'] #find way to revert join room from two side
+        if someString not in private_chat:
+            private_chat.append(someString)
+        join_room(someString)
+        print(private_chat)
 
 
 
@@ -139,7 +161,7 @@ def join(data):
     username = data["username"]
     room = data["room"]
     join_room(room)
-    for d in messages[room]:
+    for d in messages[room]: #print prv messages
         send ({'msg': d["msg"], 'username': d["username"], 'time_stamp': d["time_stamp"] })
     send({'msg': username + " has joined the " + room + " room."}, room=room)
 
@@ -157,7 +179,8 @@ def leave(data):
 @socketio.on("logout")
 def logout(data):
     global USERS
-    USERS = [d for d in USERS if d["id"] != request.sid]
+    USERS = [d for d in USERS if d["username"] != current_user.username]
+    print(USERS)
     socketio.emit("reset-user");
 
 if __name__ == "__main__":  # allow excute when file run as script

@@ -41,12 +41,12 @@
             <nav id="sidebar">
                 <h4>Rooms</h4>
                 {% for room in rooms %}
-                    <p id="{{ room|title }}" class="select-room {{room}}-room">{{ room|title }}</p>
+                    <p id="{{ room|title }}" class="select-chat {{room}}-room select-room">{{ room|title }}</p>
                 {% endfor %}
                 <h4>People</h4>
                 {% for person in user_list %}
                     {% if person['username'] != username %}
-                        <p id="{{ person['username'] }}" class="select-person {{person['username']}}">{{ person['username'] }}</p>
+                        <p id="{{ person['username'] }}" class="select-chat {{person['username']}} select-person">{{ person['username'] }}</p>
                     {% endif %}
                 {% endfor %}
             </nav>
