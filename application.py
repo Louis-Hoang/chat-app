@@ -134,6 +134,24 @@ def after_request(response):
 def send_list():
     socketio.emit("chat-list", private_chat)
 
+@socketio.on("private-chat")
+def private(data):
+    founded = False
+    for chat in private_chat: #other person click connect chat
+        if (data['user1'] in chat and data['user2'] in chat):
+            founded = True
+            join_room(chat)
+            for d in messages[chat]: #print prv messages
+                send ({'msg': d["msg"], 'username': d["username"], 'time_stamp': d["time_stamp"] })   
+            break 
+    if not founded: #first time create connect chat
+        someString = data['user1']+ "-" + data['user2'] #find way to revert join room from two side
+        if someString not in private_chat:
+            private_chat.append(someString)
+        join_room(someString)
+        messages[someString] = []
+
+
 
 @socketio.on('message') #Fix username in isChannel;
 def message(data):
@@ -146,38 +164,6 @@ def message(data):
     if room in messages:
         if payload not in messages[room]:
             messages[room].append(payload)
-
-    # print(messages)
-
-
-@socketio.on("private-chat")
-def private(data):
-    founded = False
-    for chat in private_chat: #other person click connect chat
-        if (data['user1'] in chat and data['user2'] in chat):
-            founded = True
-            join_room(chat)
-            # if chat in messages:
-            for d in messages[chat]: #print prv messages
-                send ({'msg': d["msg"], 'username': d["username"], 'time_stamp': d["time_stamp"] })
-            # else:
-            #     messages[chat] = []
-            
-            break 
-    if not founded: #first time create connect chat
-        someString = data['user1']+ "-" + data['user2'] #find way to revert join room from two side
-        if someString not in private_chat:
-            private_chat.append(someString)
-        join_room(someString)
-        # if someString in messages:
-        #     for d in messages[someString]: #print prv messages
-        #         send ({'msg': d["msg"], 'username': d["username"], 'time_stamp': d["time_stamp"] })
-        # else:
-        messages[someString] = []
-       
-        # print(private_chat)
-
-
 
 
 @socketio.on('join')

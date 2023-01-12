@@ -4,6 +4,11 @@ jQuery(document).ready(() => {
     let room = "General";
     joinRoom("General");
 
+    socket.on("reset-user", () => {
+        window.location.reload();
+        console.log("im reload");
+    });
+
     socket.on("message", (data) => {
         const text_msg = jQuery("<p class='chat-msg'></p>");
         const span_username = jQuery("<div class='username-msg'></div>");
@@ -22,11 +27,6 @@ jQuery(document).ready(() => {
         }
     });
 
-    socket.on("reset-user", () => {
-        window.location.reload();
-        console.log("im reload");
-    });
-
     jQuery("#send-message").click(function () {
         str = jQuery("#user-message").val();
         if (!(str.length == 0 || str.replace(/\s/g, "").length == 0)) {
@@ -38,8 +38,6 @@ jQuery(document).ready(() => {
             jQuery("input").val(null);
         }
     });
-
-    //Test end
 
     let msg_display = false; //avoid duplicate noti
 
@@ -62,14 +60,6 @@ jQuery(document).ready(() => {
                 }
             });
     });
-
-    // jQuery(".select-room").each((index) => {
-    //     jQuery(".select-room")
-    //         .eq(index)
-    //         .on("click", () => {
-
-    //         });
-    // });
 
     if (jQuery(".select-person").length) {
         jQuery(".select-person").each((index) => {
@@ -97,7 +87,6 @@ jQuery(document).ready(() => {
                                     });
                                     bool = true;
                                     room = elem;
-                                    console.log("case 1");
                                     break;
                                 }
                             }
@@ -109,8 +98,6 @@ jQuery(document).ready(() => {
                                     user2: receiver, //receiver
                                 });
                                 room = newRoom;
-                                console.log("case 2");
-                                // console.log(private_chat);
                             }
                             jQuery(".select-person")
                                 .eq(index)
@@ -120,8 +107,6 @@ jQuery(document).ready(() => {
                         }
                         once = true;
                     });
-
-                    console.log(`${username} have joined ${room}`);
                 });
         });
     }
