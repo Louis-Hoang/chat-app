@@ -43,7 +43,7 @@
                 {% for room in rooms %}
                     <p id="{{ room|title }}" class="select-chat {{room}}-room select-room">{{ room|title }}</p>
                 {% endfor %}
-                <h4>People</h4>
+                <h4>All users</h4>
                 {% for person in user_list %}
                     {% if person['username'] != username %}
                         <p id="{{ person['username'] }}" class="select-chat {{person['username']}} select-person">{{ person['username'] }}</p>
