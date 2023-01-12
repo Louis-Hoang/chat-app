@@ -76,51 +76,44 @@ jQuery(document).ready(() => {
             jQuery(".select-person")
                 .eq(index)
                 .on("click", () => {
+                    let private_chat = [];
                     socket.emit("request-private");
                     socket.on("chat-list", (data) => {
-                        let private_chat = data;
-                        //
-                        let bool = false;
-                        receiver = jQuery(".select-person")
-                            .eq(index)
-                            .attr("id");
-                        for (const elem of private_chat) {
-                            if (
-                                elem.includes(username) &&
-                                elem.includes(receiver)
-                            ) {
-                                leaveRoom(room);
-                                socket.emit("private-chat", {
-                                    user1: username, //sender
-                                    user2: receiver, //receiver
-                                });
-                                bool = true;
-                                room = elem;
-                                console.log("case 1");
-                                break;
-                            }
-                        }
-                        if (!bool) {
-                            newRoom = username + "-" + receiver;
-                            if (!private_chat.includes(newRoom)) {
-                                private_chat.push(newRoom);
-                            }
+                        private_chat = data;
+                    });
+
+                    let bool = false;
+                    receiver = jQuery(".select-person").eq(index).attr("id");
+                    for (const elem of private_chat) {
+                        if (
+                            elem.includes(username) &&
+                            elem.includes(receiver)
+                        ) {
                             leaveRoom(room);
                             socket.emit("private-chat", {
                                 user1: username, //sender
                                 user2: receiver, //receiver
                             });
-                            room = newRoom;
-                            console.log("case 2");
-                            // console.log(private_chat);
+                            bool = true;
+                            room = elem;
+                            console.log("case 1");
+                            break;
                         }
-                        jQuery("#display-message-section").html("");
-                        jQuery("#user-message").focus();
-                        jQuery(".select-person")
-                            .eq(index)
-                            .addClass("active-chat");
-                    });
-
+                    }
+                    if (!bool) {
+                        newRoom = username + "-" + receiver;
+                        leaveRoom(room);
+                        socket.emit("private-chat", {
+                            user1: username, //sender
+                            user2: receiver, //receiver
+                        });
+                        room = newRoom;
+                        console.log("case 2");
+                        // console.log(private_chat);
+                    }
+                    jQuery("#display-message-section").html("");
+                    jQuery("#user-message").focus();
+                    jQuery(".select-person").eq(index).addClass("active-chat");
                     console.log(`${username} have joined ${room}`);
                 });
         });

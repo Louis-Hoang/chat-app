@@ -129,28 +129,42 @@ def message(data):
     msg = data["msg"]
     username = data["username"]
     room = data["room"]
-    time_stamp = time.strftime('%m/%d/%Y %I:%M %p', time.localtime())
+    time_stamp = time.strftime('%m/%d/%Y %I:%M:%S %p', time.localtime())
     payload = {'msg': data['msg'], 'username': data['username'], 'room': data['room'], 'time_stamp': time_stamp}
     send(payload, room=room)
     if room in messages:
-        messages[room].append(payload)
+        if payload not in messages[room]:
+            messages[room].append(payload)
+
     # print(messages)
 
 
 @socketio.on("private-chat")
 def private(data):
     founded = False
-    for chat in private_chat:
+    for chat in private_chat: #other person click connect chat
         if (data['user1'] in chat and data['user2'] in chat):
             founded = True
             join_room(chat)
+            # if chat in messages:
+            for d in messages[chat]: #print prv messages
+                send ({'msg': d["msg"], 'username': d["username"], 'time_stamp': d["time_stamp"] })
+            # else:
+            #     messages[chat] = []
+            
             break 
-    if not founded:
+    if not founded: #first time create connect chat
         someString = data['user1']+ "-" + data['user2'] #find way to revert join room from two side
         if someString not in private_chat:
             private_chat.append(someString)
         join_room(someString)
-        print(private_chat)
+        # if someString in messages:
+        #     for d in messages[someString]: #print prv messages
+        #         send ({'msg': d["msg"], 'username': d["username"], 'time_stamp': d["time_stamp"] })
+        # else:
+        messages[someString] = []
+       
+        # print(private_chat)
 
 
 
