@@ -196,5 +196,4 @@ def logout(data):
     socketio.emit("reset-user");
 
 if __name__ == "__main__":  # allow excute when file run as script
-    # socketio.run(app, port=8000, debug=True)
     app.run(debug=True)
