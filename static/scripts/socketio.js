@@ -76,44 +76,51 @@ jQuery(document).ready(() => {
             jQuery(".select-person")
                 .eq(index)
                 .on("click", () => {
-                    let private_chat = [];
+                    let once = false;
                     socket.emit("request-private");
                     socket.on("chat-list", (data) => {
-                        private_chat = data;
+                        if (!once) {
+                            let bool = false;
+                            let private_chat = data;
+                            receiver = jQuery(".select-person")
+                                .eq(index)
+                                .attr("id");
+                            for (const elem of private_chat) {
+                                if (
+                                    elem.includes(username) &&
+                                    elem.includes(receiver)
+                                ) {
+                                    leaveRoom(room);
+                                    socket.emit("private-chat", {
+                                        user1: username, //sender
+                                        user2: receiver, //receiver
+                                    });
+                                    bool = true;
+                                    room = elem;
+                                    console.log("case 1");
+                                    break;
+                                }
+                            }
+                            if (!bool) {
+                                newRoom = username + "-" + receiver;
+                                leaveRoom(room);
+                                socket.emit("private-chat", {
+                                    user1: username, //sender
+                                    user2: receiver, //receiver
+                                });
+                                room = newRoom;
+                                console.log("case 2");
+                                // console.log(private_chat);
+                            }
+                            jQuery(".select-person")
+                                .eq(index)
+                                .addClass("active-chat");
+                            jQuery("#display-message-section").html("");
+                            jQuery("#user-message").focus();
+                        }
+                        once = true;
                     });
 
-                    let bool = false;
-                    receiver = jQuery(".select-person").eq(index).attr("id");
-                    for (const elem of private_chat) {
-                        if (
-                            elem.includes(username) &&
-                            elem.includes(receiver)
-                        ) {
-                            leaveRoom(room);
-                            socket.emit("private-chat", {
-                                user1: username, //sender
-                                user2: receiver, //receiver
-                            });
-                            bool = true;
-                            room = elem;
-                            console.log("case 1");
-                            break;
-                        }
-                    }
-                    if (!bool) {
-                        newRoom = username + "-" + receiver;
-                        leaveRoom(room);
-                        socket.emit("private-chat", {
-                            user1: username, //sender
-                            user2: receiver, //receiver
-                        });
-                        room = newRoom;
-                        console.log("case 2");
-                        // console.log(private_chat);
-                    }
-                    jQuery("#display-message-section").html("");
-                    jQuery("#user-message").focus();
-                    jQuery(".select-person").eq(index).addClass("active-chat");
                     console.log(`${username} have joined ${room}`);
                 });
         });
