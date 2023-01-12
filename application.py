@@ -9,10 +9,10 @@ from models import *
 
 # Config flask login
 app = Flask(__name__)
-app.secret_key = 'placeholder'
+app.secret_key = os.environ.get('SECRET')
 
 # Config database
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://okenthdbfaisxz:bcc6d85268ee971c63712f50b1f39ff76f105e7c71233322a3e665673dad5836@ec2-52-73-155-171.compute-1.amazonaws.com:5432/d6bhbpbas2bvci"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
 db = SQLAlchemy(app)
 
 # Init SocketIO
@@ -197,4 +197,4 @@ def logout(data):
 
 if __name__ == "__main__":  # allow excute when file run as script
     # socketio.run(app, port=8000, debug=True)
-    app.run(debug=True, port=8000)
+    app.run(debug=True)
