@@ -177,7 +177,8 @@ def join(data):
     join_room(room)
     for d in messages[room]: #print prv messages
         send ({'msg': d["msg"], 'username': d["username"], 'time_stamp': d["time_stamp"] })
-    send({'msg': username + " has joined the " + room + " room."}, room=room)
+    if room in ROOMS:
+        send({'msg': username + " has joined the " + room + " room."}, room=room)
 
 
 @socketio.on('leave')
@@ -186,7 +187,8 @@ def leave(data):
     username = data["username"]
     room = data["room"]
     leave_room(room)
-    send({'msg': username + " has left the " + room + " room."}, room=room)
+    if room in ROOMS:
+        send({'msg': username + " has left the " + room + " room."}, room=room)
     
 
 
