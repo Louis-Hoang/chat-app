@@ -67,6 +67,15 @@ def login():
             user_object = User.query.filter_by(
             username=login_form.username.data).first()
             login_user(user_object)
+            #####
+            duplicate = False
+            for user in USERS:
+                if user['username'] == current_user.username:
+                    duplicate = True
+            if not (duplicate):
+                user_data = {'username':current_user.username}
+                USERS.append(user_data)
+            #####
             socketio.emit("reset-user")
             return redirect(url_for('chat'))
         else:
@@ -77,7 +86,6 @@ def login():
 
 @app.route("/logout", methods=["GET"])
 def logout():
-    # USERS.pop(current_user.id,'No user found')
     logout_user()
     socketio.emit("reset-user");
     flash('Log out successfully', 'success')
@@ -90,6 +98,7 @@ def chat():
         flash('Please login', 'danger')
         return redirect(url_for('login'))
     #store logged in users
+    socketio.emit("reset-user")
     return render_template("chat.html", username = current_user.username, rooms=ROOMS, user_list = USERS)
 
 
@@ -106,18 +115,20 @@ def after_request(response):
 
 
 
-@socketio.on('connect')
-def connect_handler():
-    if current_user.is_authenticated:
-        duplicate = False
-        for user in USERS:
-            if user['username'] == current_user.username:
-                duplicate = True
-        if not (duplicate):
-            user_data = {'username':current_user.username, 'id':request.sid}
-            USERS.append(user_data)
-    else:
-        return False  # not allowed here
+# @socketio.on('connect')
+# def connect_handler():
+#     if current_user.is_authenticated:
+#         # duplicate = False
+#         # for user in USERS:
+#         #     if user['username'] == current_user.username:
+#         #         duplicate = True
+#         # if not (duplicate):
+#         #     # user_data = {'username':current_user.username, 'id':request.sid}
+#         #     user_data = {'username':current_user.username}
+#         #     USERS.append(user_data)
+#         return True
+#     else:
+#         return False  # not allowed here
 
 @socketio.on("request-private")
 def send_list():
@@ -196,7 +207,6 @@ def leave(data):
 def logout(data):
     global USERS
     USERS = [d for d in USERS if d["username"] != current_user.username]
-    print(USERS)
     socketio.emit("reset-user");
 
 if __name__ == "__main__":  # allow excute when file run as script
