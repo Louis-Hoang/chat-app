@@ -1,6 +1,7 @@
 import os
 import time
 from flask import Flask, render_template, redirect, request, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from flask_socketio import SocketIO, send, emit, join_room, leave_room, disconnect
 from wtform_fields import *
@@ -13,7 +14,9 @@ app.secret_key = os.environ.get('SECRET')
 
 # Config database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE')
-db = SQLAlchemy(app)
+app.config['SQLALCHEMY_POOL_SIZE'] = 1
+app.config['SQLALCHEMY_MAX_OVERFLOW'] = 0
+db = SQLAlchemy(app, session_options={'autocommit': True})
 
 # Init SocketIO
 socketio = SocketIO(app, manage_session=False)
