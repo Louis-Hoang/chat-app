@@ -8,7 +8,7 @@ from wtform_fields import *
 from models import *
 
 
-# Config flask logi
+# Config flask lo
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET')
 
