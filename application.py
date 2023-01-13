@@ -13,9 +13,9 @@ app.secret_key = os.environ.get('SECRET')
 
 # Config database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE')
-db = SQLAlchemy(app, session_options={'autocommit': True})
-app.config['SQLALCHEMY_POOL_SIZE'] = 1
-app.config['SQLALCHEMY_MAX_OVERFLOW'] = 0
+db = SQLAlchemy(app)
+# app.config['SQLALCHEMY_POOL_SIZE'] = 1
+# app.config['SQLALCHEMY_MAX_OVERFLOW'] = 0
 
 # Init SocketIO
 socketio = SocketIO(app, manage_session=False)
